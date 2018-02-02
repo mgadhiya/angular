@@ -1,20 +1,65 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<div id="ContentContainer">
+	<div>
+		<div id = "FamilyPanel">
+ 			<table border="1">
+					<tr><th>Filters</th></tr>
+				</table>
+				<table border="1">
+						<tr>
+                        <td>
+                            Zone
+                            <select name="zones" [(ngModel)]="selectedValueZone" #box (ngModelChange)="onChange(box.value)">
+                                <option *ngFor="let zone of zones" value= {{zone.id}} ng-selected="selectedValueZone" >{{zone.name}}</option>
+                            </select>
+                            <button (click)="clearFilters()">Clear filters</button>
+                        </td>
 
+          </tr>
+          <tr>
+              <td>
+                  City
+                  <select name="cities"  #box (change)="onChangeCity(box.value)">
+                      <option *ngFor="let city of cities | fullTextSearch:selectedValueZone :'zoneid'" [ngValue]="city" value= {{city.id}} [selected] = "city.id === cities['id']">{{city.name}}</option>
+                  </select>
+
+
+              </td>
+
+</tr>
+                </table>
+
+				<table>
+					<tr>
+              <th><a href="" ng-click="reverse=!reverse;orderClaims('fileNumber', reverse)">Id</a></th>
+						<th><a href="" ng-click="reverse=!reverse;orderClaims('fileNumber', reverse)">CityID</a></th>
+						<th><a href="" ng-click="reverse=!reverse;orderClaims('claimDateReceived', reverse)">Count</a></th>
+						<th><a href="" ng-click="reverse=!reverse;orderClaims('clientName', reverse)">Distance</a></th>
+						</tr>
+					<tr *ngFor="let famili of f">
+
+						<td>{{ famili.id }}</td>
+						<td>{{ famili.cityid }}</td>
+						<td>{{ famili.familycnt }}</td>
+						<td>{{ famili.distance }}</td>
+					</tr>
+        </table>
+
+				<table>
+
+					<tr>
+
+						<td><div id="MapPanel">
+              <app-gmap></app-gmap>
+              </div></td>
+						<td> <div id="ChartPanel">
+              <!-- <app-charts></app-charts> -->
+              </div></td>
+					</tr>
+				</table>
+		</div>
+
+
+
+	</div>
+</div>
