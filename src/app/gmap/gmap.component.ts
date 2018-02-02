@@ -22,6 +22,9 @@ export class GmapComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
+      let marker;
+      const tempmarkers = [];
+
       this.mapService
         .getMapdata()
         .subscribe(locations => (this.locations = locations));
@@ -36,8 +39,8 @@ export class GmapComponent implements AfterViewInit {
         scrollwheel: true
       });
 
-      let marker;
-      const tempmarkers = [];
+
+
       for (let i = 0; i < this.locations.length; i++) {
         marker = new google.maps.Marker({
           position: new google.maps.LatLng(
@@ -67,8 +70,7 @@ export class GmapComponent implements AfterViewInit {
             width: 35,
             height: 35
           }
-        ],
-        gridSize: 5
+        ]
       });
 
       this.markercluster.setCalculator(function(markers, numStyles) {
@@ -146,6 +148,7 @@ export class GmapComponent implements AfterViewInit {
             }
           }
         }
+
         console.log(
           'before getMarkers()' + tempmarkersclusterer.getMarkers().length
         );
