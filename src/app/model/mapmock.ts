@@ -8,7 +8,7 @@ export const  MapDatam: MapData[] =  [
       'longitude': -73.98,
       'locationName': 'Prime warehouse A',
       'count': 50,
-      'label' : 'first'
+      'city' : 'first'
 
   },
   {
@@ -17,7 +17,7 @@ export const  MapDatam: MapData[] =  [
       'longitude': -73.997,
       'locationName': 'Prime warehouse A',
       'count': 50,
-      'label' : 'second'
+      'city' : 'second'
 
   },
   {
@@ -26,7 +26,7 @@ export const  MapDatam: MapData[] =  [
     'longitude': -73.97,
     'locationName': 'Prime warehouse A',
     'count': 600,
-    'label' : 'third'
+    'city' : 'third'
 }
 ];
 

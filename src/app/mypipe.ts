@@ -17,7 +17,7 @@ export class FullTextSearchPipe implements PipeTransform {
 
           cities.push(values[i]);
         }
-        console.log('in 99');
+    //    console.log('in 99');
 
 
     }    else {

@@ -10,7 +10,7 @@
                         <td>
                             Zone
                             <select name="zones" [(ngModel)]="selectedValueZone" #box (ngModelChange)="onChange(box.value)">
-                                <option *ngFor="let zone of zones" value= {{zone.id}} ng-selected="selectedValueZone" >{{zone.name}}</option>
+                                <option *ngFor="let zone of zones" value= {{zone.id}} [selected]="selectedValueZone" >{{zone.name}}</option>
                             </select>
                             <button (click)="clearFilters()">Clear filters</button>
                         </td>
@@ -20,7 +20,7 @@
               <td>
                   City
                   <select name="cities"  #box (change)="onChangeCity(box.value)">
-                      <option *ngFor="let city of cities | fullTextSearch:selectedValueZone :'zoneid'" [ngValue]="city" value= {{city.id}} [selected] = "city.id === cities['id']">{{city.name}}</option>
+                      <option *ngFor="let city of cities | fullTextSearch:selectedValueZone :'zoneid'" [ngValue]="city" value= {{city.cityid}} [selected] = "city.cityid === cities['id']">{{city.name}}</option>
                   </select>
 
 

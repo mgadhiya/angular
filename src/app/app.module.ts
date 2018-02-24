@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
-
+import { HttpModule, JsonpModule } from '@angular/http';
 
 import { FullTextSearchPipe } from './mypipe';
 
@@ -18,22 +18,27 @@ import * as FusionCharts from 'fusioncharts';
 import * as Charts from 'fusioncharts/fusioncharts.charts';
 
 import { MapService } from './services/map.service';
+import { CoreService } from './services/core.service';
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
+
     FullTextSearchPipe,
     GmapComponent,
     ChartsComponent
+
   ],
   imports: [
     BrowserModule,
+    HttpModule,
+    JsonpModule,
     FormsModule,
     FusionChartsModule.forRoot(FusionCharts, Charts)
   ],
-  providers: [MapService],
+  providers: [MapService, CoreService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

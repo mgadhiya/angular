@@ -5,6 +5,6 @@ latitude: number;
 longitude: number;
 locationName: string;
 count: number;
-label: string;
+city: string;
 
 }
