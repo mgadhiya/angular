@@ -151,11 +151,11 @@ export class GmapComponent implements AfterViewInit {
 
       if (dist) {
         console.log('in if');
-        this.markers[i].setMap(map);
+
 
         if (!marker1.includes(this.markers[i])) {
           this.markercluster.addMarker(this.markers[i]);
-
+          this.markers[i].setMap(map);
         }
       } else {
         console.log('in else');
