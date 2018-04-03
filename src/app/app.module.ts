@@ -19,7 +19,7 @@ import * as Charts from 'fusioncharts/fusioncharts.charts';
 
 import { MapService } from './services/map.service';
 import { CoreService } from './services/core.service';
-
+import {TabModule} from 'angular-tabs-component';
 
 
 @NgModule({
@@ -36,7 +36,8 @@ import { CoreService } from './services/core.service';
     HttpModule,
     JsonpModule,
     FormsModule,
-    FusionChartsModule.forRoot(FusionCharts, Charts)
+    FusionChartsModule.forRoot(FusionCharts, Charts),
+    TabModule
   ],
   providers: [MapService, CoreService],
   bootstrap: [AppComponent]

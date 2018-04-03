@@ -1,65 +1,122 @@
-<!--The content below is only a placeholder and can be replaced.-->
 <div id="ContentContainer">
-	<div>
-		<div id = "FamilyPanel">
- 			<table border="1">
-					<tr><th>Filters</th></tr>
-				</table>
-				<table border="1">
-						<tr>
-                        <td>
-                            Zone
-                            <select name="zones" [(ngModel)]="selectedValueZone" #box (ngModelChange)="onChange(box.value)">
-                                <option *ngFor="let zone of zones" value= {{zone.id}} [selected]="selectedValueZone" >{{zone.name}}</option>
-                            </select>
-                            <button (click)="clearFilters()">Clear filters</button>
-                        </td>
+  <tabs>
+    <tab tabTitle="Map" style="background-color: rgb(230, 173, 230)">
+      <table border="1" class="table table-bordered">
+        <tr>
+          <td>
+            <span class="label label-info">Location</span>
+          </td>
+          <td>
+            <input name="startLocation" onchange="" class="form-control" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="label label-info">Radius</span>
+          </td>
+          <td>
+            <select name="radius" (change)="onChange($event.target.value)">
+              <option value=1>10</option>
+              <option value=2>20</option>
+              <option value=3>30</option>
 
-          </tr>
-          <tr>
-              <td>
-                  City
-                  <select name="cities"  #box (change)="onChangeCity(box.value)">
-                      <option *ngFor="let city of cities | fullTextSearch:selectedValueZone :'zoneid'" [ngValue]="city" value= {{city.cityid}} [selected] = "city.cityid === cities['id']">{{city.name}}</option>
-                  </select>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td >
+            <button type="button" (click)="ShowMap(showMap)" class="btn btn-info">{{ showMap == true ? 'Hide Map' : 'Show Map' }}</button>
+          </td>
+        </tr>
+      </table>
+      <table border="1" class="table table-bordered">
+        <tr>
+          <td width="100%">
+            <div id="MapPanel" *ngIf="showMap">
+              <app-gmap [location]="location" [radius]="radius"></app-gmap>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </tab>
+    <tab tabTitle="Chart">
+      <table class="table table-bordered">
+        <tr>
+          <td>
+            Zone :
+          </td>
+          <td>
+            <select name="zones" [(ngModel)]="selectedValueZone" #t (change)="onChange($event.target.value)">
+              <option *ngFor="let zone of zones" value={{zone.zoneId}} [selected]="zone.zoneId===selectedValueZone">{{zone.zoneName}}</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            City :
+          </td>
+          <td>
+            <select name="cities" (change)="onChangeCity($event.target.value)">
+
+              <option *ngFor="let city of cities | fullTextSearch:selectedValueZone :'zoneId'" value={{city.cityId}} [selected]="city.cityId === cities['cityId']">{{city.cityName}}</option>
+            </select>
 
 
-              </td>
+          </td>
 
-</tr>
-                </table>
+        </tr>
+        <tr>
+          <td>
 
-				<table>
-					<tr>
-              <th><a href="" ng-click="reverse=!reverse;orderClaims('fileNumber', reverse)">Id</a></th>
-						<th><a href="" ng-click="reverse=!reverse;orderClaims('fileNumber', reverse)">CityID</a></th>
-						<th><a href="" ng-click="reverse=!reverse;orderClaims('claimDateReceived', reverse)">Count</a></th>
-						<th><a href="" ng-click="reverse=!reverse;orderClaims('clientName', reverse)">Distance</a></th>
-						</tr>
-					<tr *ngFor="let famili of f">
+            <button type="button" (click)="ShowChart(showChart)" class="btn btn-info">{{ showChart == true ? 'Hide Chart' : 'Show Chart' }}</button>
+          </td>
+          <td>
+            <button (click)="clearFilters()" class="btn btn-info">Clear filters</button>
+          </td>
+        </tr>
+      </table>
 
-						<td>{{ famili.id }}</td>
-						<td>{{ famili.cityid }}</td>
-						<td>{{ famili.familycnt }}</td>
-						<td>{{ famili.distance }}</td>
-					</tr>
-        </table>
+      <table border="1" class="table table-bordered">
+        <tr>
+          <td width="50%">
+            <div id="ListPanel" *ngIf="families">
+              <table class="table table-bordered table-striped">
 
-				<table>
+                <tr>
 
-					<tr>
+                  <th>
+                    <a href="" ng-click="reverse=!reverse;orderClaims('fileNumber', reverse)">City</a>
+                  </th>
+                  <th>
+                    <a href="" ng-click="reverse=!reverse;orderClaims('claimDateReceived', reverse)">Total Families</a>
+                  </th>
+                  <th>
+                    <a href="" ng-click="reverse=!reverse;orderClaims('clientName', reverse)">Distance(Miles)</a>
+                  </th>
+                </tr>
+                <tr *ngFor="let family of families">
+                  <td>{{ family.city }}</td>
+                  <td>{{ family.familycount }}</td>
+                  <td>{{ family.distance }}</td>
+                </tr>
+              </table>
 
-						<td><div id="MapPanel">
-              <app-gmap></app-gmap>
-              </div></td>
-						<td> <div id="ChartPanel">
-              <!-- <app-charts></app-charts> -->
-              </div></td>
-					</tr>
-				</table>
-		</div>
 
+            </div>
+          </td>
+          <td width="50%">
+          <div id="ChartPanel" *ngIf="showChart">
+            <table width="100%">
+              <tr>
+                <td width="100%">
+                    <app-charts></app-charts>
+                </td>
+              </tr>
+            </table>
+          </div>
+          </td>
 
-
-	</div>
+      </table>
+    </tab>
+  </tabs>
 </div>

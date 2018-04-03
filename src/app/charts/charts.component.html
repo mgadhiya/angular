@@ -1,7 +1,23 @@
+<table width="100%">
+    <tr item-width="100%">
+      <td>
+
+<select name="ChartType" (change)="onChange($event.target.value)">
+    <option value='pie3d'>Pie 3D</option>
+    <option value='column2d'>Column2D</option>
+    <option value='column3d'>Column3D</option>
+
+  </select>
+</td>
+    </tr>
+    <tr item-width="100%">
+      <td>
 <fusioncharts
-    width="50%"
-    height="450"
-    type="stackedcolumn2d"
-    dataFormat="json"
-    [dataSource]=dataSource >
+    width='100%'
+    height='650'
+    [type]='ChartType'
+    dataFormat='json'
+    [dataSource] = dataSource >
   </fusioncharts>
+</td>
+</tr>

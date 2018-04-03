@@ -35,7 +35,7 @@ export class CoreService {
 
   return  req.map(response => {
     const body = response.json();
-    return body || [];
+    return body;
   });
 }
   getcity(): Observable<City[]> {

@@ -9,6 +9,7 @@ import { Http, Response, Headers, RequestOptions, RequestMethod } from '@angular
  import { MapDatam } from '../model/mapmock';
 
  import 'rxjs/add/operator/map';
+import { FamilyCount } from '../model/familycount.model';
 
 @Injectable()
 
@@ -47,9 +48,19 @@ export class MapService {
   ];
 
 
-   getMapdata(): Observable<MapData[]> {
+   getMapdata(address: String, radius: Number): Observable<MapData[]> {
 
-    const req = this.http.get('http://localhost:59607/Person/Latlong?address=Mundelein, IL, USA&dist= 260933.4');
+    const req = this.http.get('http://localhost:59607/Person/Latlong?address=address&dist=radius');
+
+    return  req.map(response => {
+      const body = response.json();
+      return body || [];
+    });
+  }
+
+  getFamilyCount(): Observable<FamilyCount[]> {
+
+    const req = this.http.get('http://localhost:59607/Person/FamilyCount?address=Mundelein, IL, USA&dist= 260933.4');
 
     return  req.map(response => {
       const body = response.json();

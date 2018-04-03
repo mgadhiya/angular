@@ -1,97 +1,98 @@
-import { Component} from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 
 import { FullTextSearchPipe } from './mypipe';
 import { CoreService } from './services/core.service';
+import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { MapService } from './services/map.service';
+import { FamilyCount} from './model/familycount.model';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
-
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  center: any[];
+  zones: any[];
+  cities: any[];
 
+  families: FamilyCount [];
+  selectedValueZone: string;
+  showMap = false;
+  showChart = false;
+  location: String;
+  radius: Number;
 
-  center = [];
-  zones = [];
-  cities = [];
+  constructor(private coreService: CoreService, private mapService: MapService) {}
 
-
-f = [];
-families = [
-  {id: 1, cityid: 1, familycnt: '4', distance: '50'},
-  {id: 2, cityid: 6, familycnt: '5', distance: '55'},
-  {id: 3, cityid: 11, familycnt: '13', distance: '53'},
-  {id: 4, cityid: 16, familycnt: '34', distance: '55'},
-  {id: 5, cityid: 1, familycnt: '5', distance: '59'},
-];
-
-  constructor(private coreService: CoreService) {
-
-    this.f = this.families;
-
-    this.coreService
-    .getcenter()
-    .subscribe(response => {
-        this.center = response;
-      });
-        this.coreService
-        .getzone()
-        .subscribe(zones => {
-            this.zones = zones;
-          });
-            this.coreService
-            .getcity()
-            .subscribe(cities => {
-                this.cities = cities;
-              });
-        }
-
- selectedValueZone = '99';
-
-
- clearFilters(): void {
-  this.selectedValueZone = '99';
-
-}
-
-onChange(value: number) {
- // console.log('zone change');
- // console.log(this.cities);
-  this.onChangeCity(value);
-
-}
-onChangeCity(value: number) {
- // console.log('city change :'  + value);
- // console.log(' this.families :'  +  this.families);
-
- // console.log('this.selectedValueZone.toString() :'  + this.selectedValueZone.toString());
-  if (value.toString() === '99') {
-    if (this.selectedValueZone.toString() !== '99') {
-      const zoneid = this.selectedValueZone.toString();
-      const city = this.cities;
-  //    console.log(' zoneid :'  +  zoneid);
-      const cities = city.filter(function(ci) {
-        return ci.zoneid.toString() === zoneid;
-      });
-
-   //   console.log(' cityids :'  + JSON.stringify(cities));
-
-
-      const citieids = cities.map(obj => obj.id);
-
-      this.f = this.families.filter(family => citieids.includes(family.cityid));
-
- //     console.log('  this.f :'  + JSON.stringify( this.f));
-
-  } else {
-    this.f = this.families;
-  }
-  } else {
-
-   this.f = this.families.filter(family => family.cityid === value);
+  clearFilters(): void {
+    this.selectedValueZone = '-1';
   }
 
-}
+  onChange(value) {
+    console.log('value :' + value);
+    this.onChangeCity(value);
+  }
+  onChangeCity(value: number) {
+    // console.log('city change :' + value);
 
+    // if (value.toString() === '-1') {
+    //   if (this.selectedValueZone.toString() !== '-1') {
+    //     const zoneId = this.selectedValueZone.toString();
+    //     const city = this.cities;
+    //     //    console.log(' zoneid :'  +  zoneid);
+    //     const cities = city.filter(function(ci) {
+    //       return ci.zoneId.toString() === zoneId;
+    //     });
+
+    //     //   console.log(' cityids :'  + JSON.stringify(cities));
+
+    //     const citieids = cities.map(obj => obj.cityId);
+
+    //     this.f = this.families.filter(family =>
+    //       citieids.includes(family.cityId)
+    //     );
+
+    //     //     console.log('  this.f :'  + JSON.stringify( this.f));
+    //   } else {
+    //     this.f = this.families;
+    //   }
+    // } else {
+    //   this.f = this.families.filter(family => family.cityId === value);
+    // }
+  }
+
+  ngOnInit() {
+
+    this.coreService.getcenter().subscribe(response => {
+      this.center = response;
+      // console.log(' center :'  + JSON.stringify(this.center));
+    });
+    this.coreService.getzone().subscribe(zones => {
+      this.zones = zones;
+      // console.log(' zones :'  + JSON.stringify(this.zones[0].zoneId));
+    });
+    this.coreService.getcity().subscribe(cities => {
+      this.cities = cities;
+      // console.log(' cities :'  + JSON.stringify(this.cities));
+    });
+
+    this.mapService.getFamilyCount().subscribe(families => {
+      this.families = families;
+      // console.log(' cities :'  + JSON.stringify(this.cities));
+
+    });
+    this.selectedValueZone = '-1';
+  }
+
+  ShowMap(value) {
+    // console.log(' value :'  + value);
+    this.showMap = !value;
+  }
+
+  ShowChart(value) {
+
+    this.showChart = !value;
+    this.families = this.families;
+  }
 }

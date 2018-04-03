@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, OnInit } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, OnInit , Input} from '@angular/core';
 import {} from '@types/googlemaps';
 import {} from '@types/markerclustererplus';
 
@@ -21,14 +21,19 @@ export class GmapComponent implements AfterViewInit {
   markercluster: any;
   markers = [];
   locations: MapData[];
+  @Input('location') location: string;
+  @Input('radius') radius: Number;
 
 
   constructor(private mapService: MapService) {}
 
   ngAfterViewInit() {
 
+    console.log('In location:' + this.location);
+    console.log('In radius:' + this.radius);
+
     this.mapService
-    .getMapdata()
+    .getMapdata(this.location, this.radius)
     .subscribe(response => {
         this.locations = response;
         console.log('In ngAfterViewInit' + JSON.stringify(this.locations));
