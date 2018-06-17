@@ -1,72 +1,97 @@
-import { Component, OnInit, Input } from '@angular/core';
-import {FamilyCount} from '../model/familycount.model';
-import { MapService } from '../services/map.service';
+import {
+  Component,
+  AfterViewInit,
+  ViewChild,
+  OnInit,
+  Input
+} from '@angular/core';
+import { ChartData } from '../model/chartdata.model';
 import { Data } from '../model/chart.model';
+import { ChartService } from '../services/chart.service';
+import { CoreService } from '../services/core.service';
 
 @Component({
   selector: 'app-charts',
   templateUrl: './charts.component.html',
   styleUrls: ['./charts.component.css']
 })
-export class ChartsComponent {
+export class ChartsComponent implements OnInit {
   demoId: string;
   dataSource: any;
-  ChartType: String = 'pie3d';
-  families: FamilyCount [];
+  ChartType: String = 'msColumn3D';
+  families: ChartData[];
 
+  @Input() chartList: ChartData[];
 
+  ngOnInit() {
+    let p: any;
+    let q: any;
+    p = [
+      {
+        category: this.chartList.map(family =>
+          Object.assign({
+            label: family.city + '(' + family.distanceInMiles + ')'
+          })
+        )
+      }
+    ];
+    q = [
+      {
+        seriesname: 'Satsangi',
+        data: this.chartList.map(family =>
+          Object.assign({
+            value: family.satsangi
+          })
+        )
+      },
+      {
+        seriesname: 'Gunbhavi',
+        data: this.chartList.map(family =>
+          Object.assign({
+            value: family.gunbhavi
+          })
+        )
+      },
+      {
+        seriesname: 'Visitor',
+        data: this.chartList.map(family =>
+          Object.assign({
+            value: family.visitor
+          })
+        )
+      },
+      {
+        seriesname: 'Unknown-Category',
+        data: this.chartList.map(family =>
+          Object.assign({
+            value: family.unknown
+          })
+        )
+      }
+    ];
 
-  constructor(private mapService: MapService) {
-    let r: any;
-    this.mapService.getFamilyCount().subscribe(families => {
-      this.families = families;
+    this.dataSource = {
+      chart: {
+        caption: 'Family Count',
+        xAxisname: 'City',
+        yAxisName: 'No. Of Families',
+        numberPrefix: '',
+        plotFillAlpha: '80',
 
-        r = this.families.map((family) => Object.assign({
-        label: family.city,
-        value: family.familycount
-      }));
-
-
-      console.log(' r :'  + JSON.stringify(r));
-
-      console.log(' families :'  + JSON.stringify(families));
-
-      this.dataSource = {
-        chart: {
-          'caption':  'Family Count',
-          'xAxisname': 'City',
-          'yAxisName': 'No. Of Families',
-          'numberPrefix': '',
-          'baseFont': 'Roboto',
-          'baseFontSize': '14',
-          'labelFontSize': '15',
-          'captionFontSize': '20',
-          'subCaptionFontSize': '16',
-          'paletteColors': '#2c7fb2,#6cc184,#fed466',
-          'bgColor': '#ffffff',
-          'legendShadow': '0',
-          'valueFontColor': '#ffffff',
-          'showXAxisLine': '1',
-          'xAxisLineColor': '#999999',
-          'divlineColor': '#999999',
-          'divLineIsDashed': '1',
-          'showAlternateHGridColor': '1',
-          'subcaptionFontBold': '0',
-          'subcaptionFontSize': '14',
-          'showHoverEffect': '1',
-          'useDataPlotColorForLabels': '1'
-        },
-        'data': r
-      };
-
-
-
-
-  });
-
-
+      },
+      // 'data': r,
+      dataset: q,
+      categories: p
+    };
   }
+
+  constructor(
+    private chartService: ChartService,
+    private coreService: CoreService
+  ) {}
+
   onChange(value: String) {
+    console.log('this.ChartType : ' + this.ChartType);
     this.ChartType = value;
 
   }
