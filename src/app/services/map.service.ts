@@ -1,67 +1,43 @@
 import { Injectable } from '@angular/core';
-
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
-
-import { MapData } from '../model/mapdata';
+import { MapData } from '../model/mapdata.model';
 import { Http, Response, Headers, RequestOptions, RequestMethod } from '@angular/http';
-
- import { MapDatam } from '../model/mapmock';
-
- import 'rxjs/add/operator/map';
-import { FamilyCount } from '../model/familycount.model';
-
+import 'rxjs/add/operator/map';
+import { EnvironmentSpecificService } from '../services/environment.specific.service';
 @Injectable()
 
 export class MapService {
+  private mapUrl: string ;
+
   MapDatam1: MapData[];
-  constructor (private http: Http) {
-
-  }
-  MapDatam: MapData[] =  [
-    {
-
-        'latitude': 40.75,
-        'longitude': -73.98,
-        'locationName': 'Prime warehouse A',
-        'count': 50,
-        'city' : 'first'
-
-    },
-    {
-
-        'latitude': 40.75,
-        'longitude': -73.997,
-        'locationName': 'Prime warehouse A',
-        'count': 50,
-        'city' : 'second'
-
-    },
-    {
-
-      'latitude': 40.75,
-      'longitude': -73.97,
-      'locationName': 'Prime warehouse A',
-      'count': 600,
-      'city' : 'third'
-  }
-  ];
-
-
-   getMapdata(address: String, radius: Number): Observable<MapData[]> {
-
-    const req = this.http.get('http://localhost:59607/Person/Latlong?address=address&dist=radius');
-
-    return  req.map(response => {
-      const body = response.json();
-      return body || [];
+  constructor (private http: Http, private envSpecificService: EnvironmentSpecificService) {
+    this.envSpecificService.getJSON().subscribe( es => {
+      this.mapUrl = es.apiUrl + 'Map/';
+      console.log( 'this.mapUrl: ' + this.mapUrl);
     });
   }
 
-  getFamilyCount(): Observable<FamilyCount[]> {
+  //  getMapDataByAddress(currentaddress: string, currentradius: number): Observable<MapData[]> {
+  //   console.log( 'in map service currentaddress: ' + currentaddress);
+  //   const currentradiusinmeter = currentradius * 1609.34;
+  //   const uri = this.mapUrl + 'FamilyCountByDistanceAddress?address=' + currentaddress + '&dist=' + currentradiusinmeter;
+  //   const finaluri = decodeURI(uri);
+  //   const req = this.http.get(finaluri);
+  //   return  req.map(response => {
+  //     const body = response.json();
+  //     console.log( 'in map service body ' + body);
+  //     return body || [];
+  //   });
+  // }
 
-    const req = this.http.get('http://localhost:59607/Person/FamilyCount?address=Mundelein, IL, USA&dist= 260933.4');
+  getMapDataByLatLng(latitude: number, longitude: number, currentradius: number): Observable<MapData[]> {
 
+    const currentradiusinmeter = currentradius * 1609.34;
+    const uri = this.mapUrl + 'FamilyCountByDistanceLatLong?latitude='
+    + latitude + '&longitude=' + longitude + '&dist=' + currentradiusinmeter;
+    const finaluri = decodeURI(uri);
+    const req = this.http.get(finaluri);
     return  req.map(response => {
       const body = response.json();
       return body || [];
