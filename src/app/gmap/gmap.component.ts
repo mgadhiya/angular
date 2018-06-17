@@ -1,9 +1,9 @@
 import { Component, AfterViewInit, ViewChild, OnInit , Input} from '@angular/core';
 import {} from '@types/googlemaps';
 import {} from '@types/markerclustererplus';
-
+import { ChartService } from '../services/chart.service';
 import { MapService } from '../services/map.service';
-import { MapData } from '../model/mapdata';
+import { MapData } from '../model/mapdata.model';
 
 @Component({
   selector: 'app-gmap',
@@ -15,57 +15,50 @@ import { MapData } from '../model/mapdata';
 export class GmapComponent implements AfterViewInit {
   @ViewChild('map') gmapElement: any;
 
+
+  @Input() currentradius: number;
+  @Input() currentlatitude: any;
+  @Input() currentlongitude: any;
+  @Input() locations: MapData [];
+
   map: google.maps.Map;
   mapcircle: google.maps.Circle;
   mapractangle: google.maps.Rectangle;
   markercluster: any;
   markers = [];
-  locations: MapData[];
-  @Input('location') location: string;
-  @Input('radius') radius: Number;
 
 
-  constructor(private mapService: MapService) {}
+
+  constructor(private chartService: ChartService, private mapService: MapService) {}
 
   ngAfterViewInit() {
 
-    console.log('In location:' + this.location);
-    console.log('In radius:' + this.radius);
-
-    this.mapService
-    .getMapdata(this.location, this.radius)
-    .subscribe(response => {
-        this.locations = response;
-        console.log('In ngAfterViewInit' + JSON.stringify(this.locations));
-     // initiate map
-      this.map = new google.maps.Map(this.gmapElement.nativeElement, {
-        center: new google.maps.LatLng(Number(this.locations[1].latitude),Number(this.locations[1].longitude)),
-        zoom: 5,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        scrollwheel: true
-      });
-           this.drawcircleinmap(this.map);
-           this.markthemap(this.map);
-           this.setclusterformarkers(this.map);
-           // this.mapcircle.bindTo('center', this.markers[0], 'position');
-  }); // scscribe
+          this.map = new google.maps.Map(this.gmapElement.nativeElement, {
+            center: new google.maps.LatLng(Number(this.currentlatitude), Number(this.currentlongitude)),
+            zoom: 10,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            scrollwheel: true
+          });
+               this.drawcircleinmap(this.map);
+               this.markthemap(this.map);
+               this.setclusterformarkers(this.map);
 
   }
 
   private drawcircleinmap(map) {
      this.mapcircle = new google.maps.Circle({
-      strokeColor: '#FF0000',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#FFFF00',
-      fillOpacity: 0.35,
+      strokeColor: '#ed7d1c',
+      strokeOpacity: 1,
+      strokeWeight: 3,
+      fillColor: '#ffffff',
+      fillOpacity: 0,
       center: map.center,
-      radius: 500000,
+      radius: this.currentradius * 1609.34,
       editable: true
      // draggable: true
     });
 
-  //  this.mapcircle.bindTo('center', map.center, 'position');
+
     this.mapcircle.setMap(this.map);
     google.maps.event.addListener(this.mapcircle, 'radius_changed', () => {
       this.mapactionspherical(this.map);
@@ -76,20 +69,17 @@ export class GmapComponent implements AfterViewInit {
     });
   }
 
-  private drawRactangleinmap(map,bounds) {
-  //  const bounds = this.mapcircle.getBounds();
+  private drawRactangleinmap(map, bounds) {
   if (this.mapractangle) {
     this.mapractangle.setMap(null);
   }
     this.mapractangle = new google.maps.Rectangle({
-      strokeColor   : '#FF0099',
+      strokeColor   : '#FFFFFF',
       strokeWeight  : 2,
       fillOpacity   : 0,
       bounds        : bounds
    });
-
    this.mapractangle.setMap(this.map);
-
 }
   private mapaction(map) {
     const bounds = this.mapcircle.getBounds();
@@ -126,10 +116,9 @@ export class GmapComponent implements AfterViewInit {
     console.log('original cluster : ' + this.markercluster.getMarkers().length);
     console.log('original maker :' + this.markers.length);
 
-    this.drawRactangleinmap(this.map,bounds);
+    this.drawRactangleinmap(this.map, bounds);
 
   }
-
   private mapactionspherical(map) {
     const bounds = this.mapcircle.getBounds();
     const radius = this.mapcircle.getRadius();
@@ -175,7 +164,7 @@ export class GmapComponent implements AfterViewInit {
     console.log('original cluster : ' + this.markercluster.getMarkers().length);
     console.log('original maker :' + this.markers.length);
 
-    this.drawRactangleinmap(this.map,bounds);
+    this.drawRactangleinmap(this.map, bounds);
 
   }
   private setclusterformarkers(map) {
@@ -219,10 +208,10 @@ export class GmapComponent implements AfterViewInit {
     let marker;
      for (let i = 0; i < this.locations.length; i++) {
       marker  = new google.maps.Marker({
-        position: new google.maps.LatLng(this.locations[i].latitude,this.locations[i].longitude),
+        position: new google.maps.LatLng(this.locations[i].latitude, this.locations[i].longitude),
         label: this.locations[i].count.toString(),
         icon: { url: 'assets/images/Man/FF6600.png' },
-        title : this.locations[i].city.toString()
+        title : this.locations[i].address.toString()
       });
       marker.setMap(this.map);
       let infowindow = null;
@@ -239,29 +228,5 @@ export class GmapComponent implements AfterViewInit {
 
 
   }
-
-
-
-
-    // }
-
-    LoadMap() {
-    console.log(this.locations);
-
-    // let infowindow = null;
-
-      // google.maps.event.addListener(marker, 'click', function() {
-      //   if (!infowindow) {
-      //     infowindow = new google.maps.InfoWindow();
-      //   }
-      //   infowindow.setContent('No. of people:' + this.locations[i].count);
-      //   infowindow.open(this.map, marker);
-      // });
-      // tempmarkers.push(marker);
-    }
-
-
-
-
 
 }
