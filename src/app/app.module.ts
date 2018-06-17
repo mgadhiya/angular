@@ -1,7 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
-import { HttpModule, JsonpModule } from '@angular/http';
+import { HttpModule,  JsonpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 
 import { FullTextSearchPipe } from './mypipe';
 
@@ -20,12 +21,15 @@ import * as Charts from 'fusioncharts/fusioncharts.charts';
 import { MapService } from './services/map.service';
 import { CoreService } from './services/core.service';
 import {TabModule} from 'angular-tabs-component';
+import { ChartService } from './services/chart.service';
+import { EnvironmentSpecificService } from './services/environment.specific.service';
+import { Ng4GeoautocompleteModule } from 'ng4-geoautocomplete';
+import { BehaviorSubject } from 'rxjs/Rx';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-
     FullTextSearchPipe,
     GmapComponent,
     ChartsComponent
@@ -34,12 +38,15 @@ import {TabModule} from 'angular-tabs-component';
   imports: [
     BrowserModule,
     HttpModule,
+    HttpClientModule,
+
     JsonpModule,
     FormsModule,
     FusionChartsModule.forRoot(FusionCharts, Charts),
-    TabModule
+    TabModule,
+    Ng4GeoautocompleteModule.forRoot()
   ],
-  providers: [MapService, CoreService],
+  providers: [EnvironmentSpecificService, MapService, CoreService, ChartService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

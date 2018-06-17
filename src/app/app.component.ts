@@ -1,10 +1,12 @@
 import { Component, AfterViewInit } from '@angular/core';
-
 import { FullTextSearchPipe } from './mypipe';
 import { CoreService } from './services/core.service';
 import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
 import { MapService } from './services/map.service';
-import { FamilyCount} from './model/familycount.model';
+import { ChartService } from './services/chart.service';
+import { EnvironmentSpecificService } from './services/environment.specific.service';
+import { ChartData } from './model/chartdata.model';
+import { MapData } from './model/mapdata.model';
 
 @Component({
   selector: 'app-root',
@@ -12,87 +14,143 @@ import { FamilyCount} from './model/familycount.model';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  center: any[];
-  zones: any[];
-  cities: any[];
+  chartList: ChartData[];
+  chartListByZone: ChartData[];
+  chartListByCity: ChartData[];
+  locations: MapData[];
 
-  families: FamilyCount [];
-  selectedValueZone: string;
   showMap = false;
   showChart = false;
-  location: String;
-  radius: Number;
 
-  constructor(private coreService: CoreService, private mapService: MapService) {}
+  currentaddress: string;
+  currentradius = 5;
+  currentlatitude: any;
+  currentlongitude: any;
+  currentzipcode: any;
 
-  clearFilters(): void {
-    this.selectedValueZone = '-1';
-  }
+  public userSettingsforlocation: any = {
+    showSearchButton: false,
+    inputPlaceholderText: 'Enter Address Here...',
+    currentLocIconUrl:
+      'https://cdn4.iconfinder.com/data/icons/proglyphs-traveling/512/Current_Location-512.png',
+    locationIconUrl:
+      'http://www.myiconfinder.com/uploads/iconsets/369f997cef4f440c5394ed2ae6f8eecd.png',
+    noOfRecentSearchSave: 8
+  };
 
-  onChange(value) {
-    console.log('value :' + value);
-    this.onChangeCity(value);
-  }
-  onChangeCity(value: number) {
-    // console.log('city change :' + value);
-
-    // if (value.toString() === '-1') {
-    //   if (this.selectedValueZone.toString() !== '-1') {
-    //     const zoneId = this.selectedValueZone.toString();
-    //     const city = this.cities;
-    //     //    console.log(' zoneid :'  +  zoneid);
-    //     const cities = city.filter(function(ci) {
-    //       return ci.zoneId.toString() === zoneId;
-    //     });
-
-    //     //   console.log(' cityids :'  + JSON.stringify(cities));
-
-    //     const citieids = cities.map(obj => obj.cityId);
-
-    //     this.f = this.families.filter(family =>
-    //       citieids.includes(family.cityId)
-    //     );
-
-    //     //     console.log('  this.f :'  + JSON.stringify( this.f));
-    //   } else {
-    //     this.f = this.families;
-    //   }
-    // } else {
-    //   this.f = this.families.filter(family => family.cityId === value);
-    // }
-  }
+  constructor(
+    private coreService: CoreService,
+    private mapService: MapService,
+    private chartService: ChartService,
+    private envSpecificService: EnvironmentSpecificService
+  ) {}
 
   ngOnInit() {
+    this.currentaddress = null;
+    this.currentradius = 5;
 
-    this.coreService.getcenter().subscribe(response => {
-      this.center = response;
-      // console.log(' center :'  + JSON.stringify(this.center));
-    });
-    this.coreService.getzone().subscribe(zones => {
-      this.zones = zones;
-      // console.log(' zones :'  + JSON.stringify(this.zones[0].zoneId));
-    });
-    this.coreService.getcity().subscribe(cities => {
-      this.cities = cities;
-      // console.log(' cities :'  + JSON.stringify(this.cities));
-    });
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        this.currentlatitude = position.coords.latitude;
+        this.currentlongitude = position.coords.longitude;
 
-    this.mapService.getFamilyCount().subscribe(families => {
-      this.families = families;
-      // console.log(' cities :'  + JSON.stringify(this.cities));
-
-    });
-    this.selectedValueZone = '-1';
+        this.loadmapchart();
+      });
+    }
   }
 
-  ShowMap(value) {
-    // console.log(' value :'  + value);
-    this.showMap = !value;
+  onChangeRadius(value: number) {
+    this.showMap = false;
+    this.showChart = false;
+    this.currentradius = value;
+    if (this.currentaddress == null) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          this.currentlatitude = position.coords.latitude;
+          this.currentlongitude = position.coords.longitude;
+          this.loadmapchart();
+        });
+      }
+     } else {
+      this.loadmapchart();
+     }
   }
 
-  ShowChart(value) {
+  autoCompleteCallback1(selectedData: any) {
 
-    this.showChart = !value;
-    this.families = this.families;
+    console.log( 'in load autoCompleteCallback1: ');
+    this.showMap = false;
+    this.showChart = false;
+
+    this.currentaddress = JSON.stringify(selectedData.data.formatted_address);
+    this.currentlatitude = selectedData.data.geometry.location.lat;
+    this.currentlongitude = selectedData.data.geometry.location.lng;
+    this.currentzipcode = JSON.stringify(selectedData.data.address_components[7].long_name);
+
+    console.log( ' this.currentaddress' +  this.currentaddress);
+    console.log( ' this.Zipcode : ' +  this.currentzipcode);
+    if (this.currentaddress == null) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          this.currentlatitude = position.coords.latitude;
+          this.currentlongitude = position.coords.longitude;
+          this.loadmapchart();
+        });
+      }
+     }  else {
+      this.loadmapchart();
+     }
+
+  }
+
+  loadmapchart() {
+    console.log('this.currentaddress : ' +  this.currentaddress);
+    console.log('this.currentlatitude : ' + this.currentlatitude);
+     console.log('this.currentlongitude : ' + this.currentlongitude);
+     console.log('this.currentradius : ' + this.currentradius * 1609.34);
+
+    console.log( 'in load mapchart: ');
+    this.chartService
+    .getFamilyCountByCatLatLng(
+      this.currentlatitude,
+      this.currentlongitude,
+      this.currentradius,
+      this.currentzipcode
+    )
+    .subscribe(chartList => {
+      this.chartList = chartList || [];
+      this.showChart = true;
+    });
+    this.chartService
+    .getFamilyCountByCatLatLngZone(
+      this.currentlatitude,
+      this.currentlongitude,
+      this.currentradius
+    )
+    .subscribe(chartList => {
+      this.chartListByZone = chartList || [];
+      this.showChart = true;
+    });
+    this.chartService
+    .getFamilyCountByCatLatLngCity(
+      this.currentlatitude,
+      this.currentlongitude,
+      this.currentradius
+    )
+    .subscribe(chartList => {
+      this.chartListByCity = chartList || [];
+      this.showChart = true;
+    });
+  this.mapService
+    .getMapDataByLatLng(
+      this.currentlatitude,
+      this.currentlongitude,
+      this.currentradius
+    )
+    .subscribe(locations => {
+      this.locations = null;
+      this.locations = locations;
+      this.showMap = true;
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('radius App', () => {
+describe('Mandir App', () => {
   let page: AppPage;
 
   beforeEach(() => {

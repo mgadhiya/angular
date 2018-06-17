@@ -1,39 +1,53 @@
 <div id="ContentContainer">
   <tabs>
-    <tab tabTitle="Map" style="background-color: rgb(230, 173, 230)">
-      <table border="1" class="table table-bordered">
-        <tr>
-          <td>
-            <span class="label label-info">Location</span>
-          </td>
-          <td>
-            <input name="startLocation" onchange="" class="form-control" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="label label-info">Radius</span>
-          </td>
-          <td>
-            <select name="radius" (change)="onChange($event.target.value)">
-              <option value=1>10</option>
-              <option value=2>20</option>
-              <option value=3>30</option>
+<br/>
+<br/>
+      <table  style="background-color: #ffffff; filter: alpha(opacity=40); opacity: 0.95;border:1px rgb(202, 202, 202) solid; ">
+          <tr  padding-top:20px>
+            <td>
+              <span class="label label-info">Location</span>
+            </td>
+            <td>
+              <ng4geo-autocomplete [userSettings]="userSettingsforlocation" (componentCallback)="autoCompleteCallback1($event)"></ng4geo-autocomplete>
+            </td>
+          </tr>
+          <br/>
+          <tr>
+            <td>
+              <span class="label label-info">Radius</span>
+            </td>
+            <td>
+              <select name="radius" (change)="onChangeRadius($event.target.value)">
+                  <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=20>20</option>
+                <option value=30>30</option>
+                <option value=40>40</option>
+                <option value=50>50</option>
+                <option value=60>60</option>
+                <option value=75>75</option>
+                <option value=76>75</option>
+              </select>
+            </td>
+          </tr>
 
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td >
-            <button type="button" (click)="ShowMap(showMap)" class="btn btn-info">{{ showMap == true ? 'Hide Map' : 'Show Map' }}</button>
-          </td>
-        </tr>
+        </table>
+        <br/>
+        <br/>
+
+        <tab tabTitle="Map" style="background-color: rgb(255, 255, 255)">
+      <table border="1" class="table table-bordered">
       </table>
       <table border="1" class="table table-bordered">
         <tr>
           <td width="100%">
-            <div id="MapPanel" *ngIf="showMap">
-              <app-gmap [location]="location" [radius]="radius"></app-gmap>
+            <div id="MapPanel" *ngIf="showMap" [(ngModel)]="locations" name="locations" ngDefaultControl>
+              <app-gmap
+                    [currentradius] ='currentradius'
+                    [currentlatitude] ='currentlatitude'
+                    [currentlongitude]='currentlongitude'
+                    [locations]='locations'
+              ></app-gmap>
             </div>
           </td>
         </tr>
@@ -41,82 +55,160 @@
     </tab>
     <tab tabTitle="Chart">
       <table class="table table-bordered">
-        <tr>
-          <td>
-            Zone :
-          </td>
-          <td>
-            <select name="zones" [(ngModel)]="selectedValueZone" #t (change)="onChange($event.target.value)">
-              <option *ngFor="let zone of zones" value={{zone.zoneId}} [selected]="zone.zoneId===selectedValueZone">{{zone.zoneName}}</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            City :
-          </td>
-          <td>
-            <select name="cities" (change)="onChangeCity($event.target.value)">
-
-              <option *ngFor="let city of cities | fullTextSearch:selectedValueZone :'zoneId'" value={{city.cityId}} [selected]="city.cityId === cities['cityId']">{{city.cityName}}</option>
-            </select>
-
-
-          </td>
-
-        </tr>
-        <tr>
-          <td>
-
-            <button type="button" (click)="ShowChart(showChart)" class="btn btn-info">{{ showChart == true ? 'Hide Chart' : 'Show Chart' }}</button>
-          </td>
-          <td>
-            <button (click)="clearFilters()" class="btn btn-info">Clear filters</button>
-          </td>
-        </tr>
       </table>
-
       <table border="1" class="table table-bordered">
         <tr>
           <td width="50%">
-            <div id="ListPanel" *ngIf="families">
+            <div id="ListPanel" *ngIf="showChart"  [(ngModel)]="chartList" name="chartList" ngDefaultControl>
               <table class="table table-bordered table-striped">
-
                 <tr>
 
                   <th>
-                    <a href="" ng-click="reverse=!reverse;orderClaims('fileNumber', reverse)">City</a>
+                    <a>Distance In Miles</a>
+                  </th>
+
+                  <th>
+                    <a>Satsangi</a>
                   </th>
                   <th>
-                    <a href="" ng-click="reverse=!reverse;orderClaims('claimDateReceived', reverse)">Total Families</a>
+                    <a>Gunbhavi</a>
                   </th>
                   <th>
-                    <a href="" ng-click="reverse=!reverse;orderClaims('clientName', reverse)">Distance(Miles)</a>
-                  </th>
+                      <a>Visitor</a>
+                    </th>
+                    <th>
+                        <a>Unknown-Category</a>
+                      </th>
+                      <th>
+                        <a>Total Person</a>
+                      </th>
+                      <th>
+                        <a>Zones</a>
+                      </th>
                 </tr>
-                <tr *ngFor="let family of families">
-                  <td>{{ family.city }}</td>
-                  <td>{{ family.familycount }}</td>
-                  <td>{{ family.distance }}</td>
-                </tr>
+                <tr *ngFor="let family of chartList">
+                  <td>{{family.distanceInMiles}}</td>
+                  <td>{{family.satsangi}}</td>
+                  <td>{{family.gunbhavi}}</td>
+                  <td>{{family.visitor}}</td>
+                  <td>{{family.unknown}}</td>
+                  <td>{{family.totalCount}}</td>
+                  <td>{{family.zoneName}}</td>
+                                </tr>
               </table>
-
-
             </div>
           </td>
-          <td width="50%">
-          <div id="ChartPanel" *ngIf="showChart">
+          </tr>
+
+          <!-- <tr><b>Zone Wise</b></tr>
+          <tr>
+            <td width="50%">
+              <div id="ListPanel" *ngIf="showChart"  [(ngModel)]="chartList" name="chartList" ngDefaultControl>
+                <table class="table table-bordered table-striped">
+                  <tr>
+
+                    <th>
+                      <a>Distance In Miles</a>
+                    </th>
+
+                    <th>
+                      <a>Zone</a>
+                    </th>
+                    <th>
+                      <a>Satsangi</a>
+                    </th>
+                    <th>
+                      <a>Gunbhavi</a>
+                    </th>
+                    <th>
+                        <a>Visitor</a>
+                      </th>
+                      <th>
+                          <a>Unknown-Category</a>
+                        </th>
+                        <th>
+                          <a>Total Person</a>
+                        </th>
+
+                  </tr>
+                  <tr *ngFor="let family of chartListByZone">
+                    <td>{{family.distanceInMiles}}</td>
+                    <td>{{family.zoneName}}</td>
+                    <td>{{family.satsangi}}</td>
+                    <td>{{family.gunbhavi}}</td>
+                    <td>{{family.visitor}}</td>
+                    <td>{{family.unknown}}</td>
+                    <td>{{family.totalCount}}</td>
+
+
+                                  </tr>
+                </table>
+              </div>
+            </td>
+            </tr>
+<tr><b>City Wise</b></tr>
+
+          <tr>
+            <td width="50%">
+              <div id="ListPanel" *ngIf="showChart"  [(ngModel)]="chartList" name="chartList" ngDefaultControl>
+                <table class="table table-bordered table-striped">
+                  <tr>
+
+                    <th>
+                      <a>Distance In Miles</a>
+                    </th>
+
+                    <th>
+                      <a>City</a>
+                    </th>
+                    <th>
+                      <a>Satsangi</a>
+                    </th>
+                    <th>
+                      <a>Gunbhavi</a>
+                    </th>
+                    <th>
+                        <a>Visitor</a>
+                      </th>
+                      <th>
+                          <a>Unknown-Category</a>
+                        </th>
+                        <th>
+                          <a>Total Person</a>
+                        </th>
+
+                  </tr>
+                  <tr *ngFor="let family of chartListByCity">
+                    <td>{{family.distanceInMiles}}</td>
+
+                    <td>{{family.city}}</td>
+
+                    <td>{{family.satsangi}}</td>
+                    <td>{{family.gunbhavi}}</td>
+                    <td>{{family.visitor}}</td>
+                    <td>{{family.unknown}}</td>
+                    <td>{{family.totalCount}}</td>
+                                  </tr>
+                </table>
+              </div>
+            </td>
+            </tr>
+
+          <!-- <td width="50%">
+          <div id="ChartPanel" *ngIf="showChart" [(ngModel)]="chartList" name="chartList" ngDefaultControl>
             <table width="100%">
               <tr>
                 <td width="100%">
-                    <app-charts></app-charts>
+                    <app-charts
+                   [chartList] ='chartList'
+                    ></app-charts>
                 </td>
               </tr>
             </table>
           </div>
-          </td>
-
+          </td> -->
       </table>
     </tab>
   </tabs>
+ -->
 </div>
